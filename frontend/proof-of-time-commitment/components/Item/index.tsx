@@ -48,11 +48,11 @@ const Items = ({ id, title, onClick }: ItemsType) => {
       <div className="flex items-center justify-between">
         <span>{title}</span>
         <button
-          className="border p-2 text-xs rounded-xl shadow-lg hover:shadow-xl"
+          className="border p-2 h-9 w-9 text-xs rounded-xl shadow-lg hover:shadow-xl"
           {...listeners}
           aria-label="Drag item"
         >
-          Drag Handle
+		  <img src="drag-and-drop.png" alt="crypto task" style={{maxWidth: "100%"}}></img>
         </button>
       </div>
     </div>

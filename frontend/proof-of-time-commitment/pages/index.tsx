@@ -92,9 +92,9 @@ export default function Home() {
   useEffect(() => {
     if (containers.length === 0) {
       const initialContainers = [
-        { title: 'To-Do', id: `container-${uuidv4()}`, items: [] },
-        { title: 'In-Progress', id: `container-${uuidv4()}`, items: [] },
-        { title: 'In-Review', id: `container-${uuidv4()}`, items: [] },
+        { title: 'Todo', id: `container-${uuidv4()}`, items: [] },
+        { title: 'In progress', id: `container-${uuidv4()}`, items: [] },
+        { title: 'Review', id: `container-${uuidv4()}`, items: [] },
         { title: 'Done', id: `container-${uuidv4()}`, items: [] },
       ];
       setContainers(initialContainers);
@@ -176,9 +176,9 @@ export default function Home() {
   useEffect(() => {
     if (containers.length === 0) {
       const initialContainers = [
-        { title: 'To-Do', id: `container-${uuidv4()}`, items: [] },
-        { title: 'In-Progress', id: `container-${uuidv4()}`, items: [] },
-        { title: 'In-Review', id: `container-${uuidv4()}`, items: [] },
+        { title: 'Todo', id: `container-${uuidv4()}`, items: [] },
+        { title: 'In progress', id: `container-${uuidv4()}`, items: [] },
+        { title: 'Review', id: `container-${uuidv4()}`, items: [] },
         { title: 'Done', id: `container-${uuidv4()}`, items: [] },
       ];
       setContainers(initialContainers);
@@ -446,7 +446,7 @@ export default function Home() {
       {/* Add Item Modal */}
       <Modal showModal={showAddItemModal} setShowModal={setShowAddItemModal}>
         <div className="flex flex-col w-full max-w-lg p-6 bg-white rounded-lg shadow-lg">
-          <h1 className="text-gray-800 text-3xl font-bold mb-4">Add Item</h1>
+          <h1 className="text-gray-800 text-3xl font-bold mb-4">Add task</h1>
 
           <form className="w-full flex flex-col gap-y-4">
             <div className="flex flex-col">
@@ -485,7 +485,7 @@ export default function Home() {
             </div>
 
             <Button onClick={onAddItem} className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700">
-              Add Item
+              Save
             </Button>
           </form>
         </div>
@@ -512,19 +512,22 @@ export default function Home() {
         </div>
       </Modal>
 
-      <div className="flex items-center justify-between gap-y-2">
-        <h1 className="text-gray-800 text-3xl font-bold">CrytoTask</h1>
+      <div className="flex items-center justify-between">
+		<img src="time_log.png" alt="crypto task" style={{maxWidth: "14%"}}></img>
 
         {/* Dropdown */}
-        <select
-          value={selectedOption}
-          onChange={handleDropdownChange}
-          className="border border-gray-300 p-2 rounded"
-        >
-          <option value="option1">Option 1</option>
-          <option value="option2">Option 2</option>
-          <option value="option3">Option 3</option>
-        </select>
+		<div className="flex items-center justify-between">
+			<h1 className="text-right text-white">Projects:</h1>
+	        <select
+	          value={selectedOption}
+	          onChange={handleDropdownChange}
+	          className="border border-gray-300 p-2 rounded"
+	        >
+	          <option value="option1">Ecommerce platform</option>
+	          <option value="option2">Educational game</option>
+	          <option value="option3">Hungry hamster</option>
+	        </select>
+		</div>
           <DynamicWidget />
       </div>
 
