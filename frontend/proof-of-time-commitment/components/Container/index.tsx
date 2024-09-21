@@ -42,7 +42,7 @@ const Container = ({
     >
       <div className="flex items-center justify-between">
         <div className="flex flex-col gap-y-1">
-          <h1 className="text-gray-800 text-xl">{title}</h1>
+          <h1 className="text-gray-800 text-m">{title}</h1>
           <p className="text-gray-400 text-sm">{description}</p>
         </div>
       </div>
@@ -50,9 +50,9 @@ const Container = ({
       {children}
 
       {/* Conditionally render the Add Item button only if the user is a manager */}
-      {userRole === 'manager' && title === 'To-Do' && (
+      {userRole === 'manager' && title === 'Todo' && (
         <Button variant="ghost" onClick={onAddItem}>
-          Add Item
+		  <img src="plus.png" alt="crypto task" style={{maxWidth: "25%"}}></img>
         </Button>
       )}
     </div>
