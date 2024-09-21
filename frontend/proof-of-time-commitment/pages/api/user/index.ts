@@ -12,49 +12,45 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 		const { name, desc, sp, assignee, projectId, status } = req.body;
 
 		try {
-			const task = await prisma.task.create({
+			const user = await prisma.user.create({
 				data: {
 					name,
-					desc,
-					sp,
-					assignee,
-					project: { connect: { id: projectId } },
-					status,
+					address,
 				},
 			});
 
-			return res.status(201).json(task);
+			return res.status(201).json(user);
 		} catch (error) {
 			console.error(error);
-			return res.status(500).json({ message: 'Error creating task' });
+			return res.status(500).json({ message: 'Error creating user' });
 		}
 	} else if (req.method === 'GET') {
 		if (req.query.id) {
 			const taskId = req.query.id;
 
 			try {
-				const task = await prisma.task.findUnique({
+				const user = await prisma.user.findUnique({
 					where: { id: taskId },
 				});
 
 				if (taskId) {
 
 				}
-				if (!task) {
-					return res.status(404).json({message: 'Task not found'});
+				if (!user) {
+					return res.status(404).json({message: 'user not found'});
 				}
-				return res.status(200).json(task)
+				return res.status(200).json(user)
 			} catch (error) {
 				console.error(error)
-				return res.status(500).json({message: 'Error retrieving task'});
+				return res.status(500).json({message: 'Error retrieving user'});
 			}
 		} else {
 			try {
-				const tasks = await prisma.task.findMany();
+				const tasks = await prisma.user.findMany();
 				return res.status(200).json(tasks);
 			} catch (error) {
 				console.error(error)
-				return res.status(500).json({message: 'Error retrieving task'});
+				return res.status(500).json({message: 'Error retrieving user'});
 			}
 		}
 	} else {

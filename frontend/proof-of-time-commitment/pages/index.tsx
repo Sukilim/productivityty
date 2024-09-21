@@ -32,8 +32,18 @@ import Modal from '@/components/Modal';
 import Input from '@/components/Input';
 import { Button } from '@/components/Button';
 
+import { ethers } from "ethers";
+import { getSigner, getWeb3Provider } from '@dynamic-labs/ethers-v6';
+import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
+import { AccountabilityManager } from "../contract/AccountabilityManager";
+import { PrismaClient } from '@prisma/client';
+
+const contractABI = AccountabilityManager.abi;
+const contractAddress = AccountabilityManager.address;
+
 const inter = Inter({ subsets: ['latin'] });
 
+const prisma = new PrismaClient();
 type DNDType = {
   id: UniqueIdentifier;
   title: string;
@@ -56,6 +66,8 @@ export default function Home() {
 
   const [userRole, setUserRole] = useState<'worker' | 'manager'>('manager'); // Defaulting to 'manager' for now
   const [showHereModal, setShowHereModal] = useState(false);
+	const { primaryWallet } = useDynamicContext();
+	const [address, setUserAddress] = useState<string | null >(null);
 
   // New state for dropdown
   const [selectedOption, setSelectedOption] = useState('option1');
@@ -64,6 +76,14 @@ export default function Home() {
   const handleDropdownChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedOption(event.target.value);
   };
+
+	useEffect(() => {
+		if (primaryWallet) {
+			setUserAddress(primaryWallet.address);
+		} else {
+			setUserAddress(null);
+		}
+	}, [primaryWallet]);
 
   useEffect(() => {
     if (containers.length === 0) {
@@ -102,6 +122,50 @@ export default function Home() {
       setShowItemDetailModal(true); // Show the item detail modal
     }
   }
+	
+	const assignTask = async (taskId, employeeAddress) => {
+		let signer = null;
+		let provider;
+		if (window.ethereum === null) {
+			console.log("METAMASK NOT INSTALLED, using read only defaults");
+			provider = ethers.getDefaultProvider()
+		} else {
+			provider = new ethers.BrowserProvider(window.ethereum);
+			signer = await provider.getSigner();
+		}
+
+		let contract = new ethers.Contract(contractAddress, contractABI, signer)
+
+		try {
+			const tx = await contract.assignTask(taskId, employeeAddress);
+			await tx.wait();
+			console.log("Task assigend successs")
+//TODO: MOVE TO INPROGRESS FOR THE TICKET
+		} catch (err) {
+			console.error("Task assigned error: ", err)
+		}
+	};
+
+	const isManager = async () => {
+		let signer = null;
+		let provider;
+		if (window.ethereum === null) {
+			console.log("METAMASK NOT INSTALLED, using read only defaults");
+			provider = ethers.getDefaultProvider()
+		} else {
+			provider = new ethers.BrowserProvider(window.ethereum);
+			signer = await provider.getSigner();
+		}
+		let contract = new ethers.Contract(contractAddress, contractABI, signer)
+		try {
+			const isManager = await contract.managers(primaryWallet?.address);
+			if (isManager === true) {
+//TODO: SET STATE FOR MANAGER BOOLEAN
+			}
+		} catch (err) {
+			console.error("Error checking for manager: ", err);
+		}
+	}
 
   useEffect(() => {
     if (containers.length === 0) {
@@ -115,9 +179,10 @@ export default function Home() {
     }
   }, [containers]);
 
-  const onAddItem = () => {
+  const onAddItem = async () => {
     if (!itemName) return;
     const id = `item-${uuidv4()}`;
+	const employeeAddress = "0xD2B0A5cBb2614d755BA7AF7B26B07A3467c0E38E";
     const container = containers.find((item) => item.id === currentContainerId);
     if (!container) return;
     container.items.push({
@@ -126,6 +191,15 @@ export default function Home() {
     });
     setContainers([...containers]);
     setItemName('');
+	// const taskResponse = await fetch('/api/task', {
+ //    method: 'POST',
+ //    headers: { 'Content-Type': 'application/json' },
+ //    body: JSON.stringify({ name: name, address: employeeAddress }),
+	//   });
+	//   const newTask = await taskResponse.json();
+	// 	const taskId = newTask.id;
+
+	assignTask(1, employeeAddress);
     setShowAddItemModal(false);
   };
 
@@ -412,15 +486,7 @@ export default function Home() {
           <option value="option2">Option 2</option>
           <option value="option3">Option 3</option>
         </select>
-
-        <DynamicContextProvider
-          settings={{
-            environmentId: "eee025ae-5ce2-4293-82dc-577f6ae2b063",
-            walletConnectors: [EthereumWalletConnectors],
-          }}
-        >
           <DynamicWidget />
-        </DynamicContextProvider>
       </div>
 
       <div className="mt-10">
