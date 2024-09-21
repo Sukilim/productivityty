@@ -168,6 +168,8 @@ export default function Home() {
 	};
 
 	const claimTaskCompletion = async (taskId, managerAddress) => {
+		console.log("TASKID:", taskId)
+		console.log("MANAGER ADDRESS:", managerAddress)
 		let signer = null;
 		let provider;
 		if (window.ethereum === null) {
@@ -287,10 +289,11 @@ export default function Home() {
 		setStoryPoints(0);
 		setDescription('');
 		setStatus('');
+		console.log("MANAGER ADDRESS: ", primaryWallet.address)
 		const taskResponse = await fetch('/api/tasks/', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ name: itemName, projectId: "cm1cislml002213t566g8oddi", assignee: assigned, desc: description, sp: storyPoints, status: "in progress" }),
+			body: JSON.stringify({ name: itemName, projectId: 3, assignee: assigned, desc: description, sp: storyPoints, status: "in progress" , manager: primaryWallet.address}),
 		});
 		const newTask = await taskResponse.json();
 

@@ -8,21 +8,22 @@ generator client {
 }
 
 model Task {
-  id       String   @id @default(cuid())
+  id       Int   @id @default(autoincrement())
   name     String
   desc     String
   sp       Int
   // assignee String   // wallet address of the assignee
   assignee String	// wallet address of the assignee
   project  Project @relation(fields: [projectId], references: [id])
-  projectId String
+  projectId Int
   status   String
+  manager String	// wallet address of the assignee
 
   @@map("tasks")
 }
 
 model Project {
-  id       String   @id @default(cuid())
+  id       Int   @id @default(autoincrement())
   name     String
   contract String   // wallet address of the contract
 

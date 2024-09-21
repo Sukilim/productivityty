@@ -10,7 +10,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 		console.log("test");
 		// return res.status(405).json({ message: 'Method not allowed' });
 
-		const { name, desc, sp, assignee, projectId, status } = req.body;
+		const { name, desc, sp, assignee, projectId, status, manager } = req.body;
 
 		try {
 			const task = await prisma.task.create({
@@ -21,6 +21,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 					assignee,
 					project: { connect: { id: projectId } },
 					status,
+					manager,
 				},
 			});
 
