@@ -1,0 +1,30 @@
+datasource db {
+  provider = "postgresql"
+  url = env("POSTGRES_PRISMA_URL") // uses connection pooling
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Task {
+  id       String   @id @default(cuid())
+  name     String
+  desc     String
+  sp       Int
+  assignee String   // wallet address of the assignee
+  project  Project @relation(fields: [projectId], references: [id])
+  projectId String
+  status   String
+
+  @@map("tasks")
+}
+
+model Project {
+  id       String   @id @default(cuid())
+  name     String
+  contract String   // wallet address of the contract
+
+  tasks    Task[]
+  @@map("projects")
+}
