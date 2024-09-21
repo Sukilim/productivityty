@@ -7,9 +7,10 @@ import clsx from 'clsx';
 type ItemsType = {
   id: UniqueIdentifier;
   title: string;
+  onClick?: () => void; // Optional onClick handler if you want to handle clicks
 };
 
-const Items = ({ id, title }: ItemsType) => {
+const Items = ({ id, title, onClick }: ItemsType) => {
   const {
     attributes,
     listeners,
@@ -23,24 +24,29 @@ const Items = ({ id, title }: ItemsType) => {
       type: 'item',
     },
   });
+
+  const style = {
+    transform: CSS.Translate.toString(transform),
+    transition,
+  };
+
   return (
     <div
       ref={setNodeRef}
       {...attributes}
-      style={{
-        transition,
-        transform: CSS.Translate.toString(transform),
-      }}
+      style={style}
       className={clsx(
         'px-2 py-4 bg-white shadow-md rounded-xl w-full border border-transparent hover:border-gray-200 cursor-pointer',
         isDragging && 'opacity-50',
       )}
+      onClick={onClick} // Handles clicks if an onClick handler is passed
     >
       <div className="flex items-center justify-between">
-        {title}
+        <span>{title}</span>
         <button
           className="border p-2 text-xs rounded-xl shadow-lg hover:shadow-xl"
           {...listeners}
+          aria-label="Drag item"
         >
           Drag Handle
         </button>

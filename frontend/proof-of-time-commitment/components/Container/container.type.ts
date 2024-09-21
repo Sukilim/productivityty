@@ -6,4 +6,5 @@ export default interface ContainerProps {
   title?: string;
   description?: string;
   onAddItem?: () => void;
+  userRole: 'worker' | 'manager'; // Add userRole prop to the type
 }
