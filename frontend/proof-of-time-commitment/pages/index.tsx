@@ -48,7 +48,10 @@ export default function Home() {
   const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
   const [currentContainerId, setCurrentContainerId] = useState<UniqueIdentifier>();
   const [containerName, setContainerName] = useState('');
-  const [itemName, setItemName] = useState('');
+  const [itemName, setItemName] = useState(''); // For the item name
+  const [assigned, setAssigned] = useState(''); // For the person assigned to the task
+  const [storyPoints, setStoryPoints] = useState(0); // For the story points
+  const [description, setDescription] = useState('');
   const [showAddContainerModal, setShowAddContainerModal] = useState(false);
   const [showAddItemModal, setShowAddItemModal] = useState(false);
   const [showItemDetailModal, setShowItemDetailModal] = useState(false); // New state for item detail modal
@@ -117,17 +120,44 @@ export default function Home() {
 
   const onAddItem = () => {
     if (!itemName) return;
+  
     const id = `item-${uuidv4()}`;
-    const container = containers.find((item) => item.id === currentContainerId);
-    if (!container) return;
-    container.items.push({
+    const containerIndex = containers.findIndex((item) => item.id === currentContainerId);
+  
+    if (containerIndex === -1) return; // If container is not found, return early
+  
+    // Create a new item
+    const newItem = {
       id,
       title: itemName,
-    });
-    setContainers([...containers]);
+      description: description,
+      story_points: storyPoints,
+      assigned: assigned,
+    };
+  
+    // Create a new containers array by spreading the current array
+    const newContainers = [...containers];
+  
+    // Create a new items array for the current container
+    const updatedItems = [...newContainers[containerIndex].items, newItem];
+  
+    // Update the container with the new items array
+    newContainers[containerIndex] = {
+      ...newContainers[containerIndex],
+      items: updatedItems,
+    };
+  
+    // Update the state with the new containers array
+    setContainers(newContainers);
+  
+    // Reset form fields
     setItemName('');
+    setAssigned('');
+    setStoryPoints(0);
+    setDescription('');
     setShowAddItemModal(false);
   };
+  
 
 
   function findValueOfItems(id: UniqueIdentifier | undefined, type: string) {
@@ -172,6 +202,7 @@ export default function Home() {
   function handleDragStart(event: DragStartEvent) {
     const { active } = event;
     const { id } = active;
+    
     setActiveId(id);
   }
 
@@ -376,6 +407,8 @@ export default function Home() {
                 id="title"
                 type="text"
                 className="border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                value={itemName}  // Binds the input to the itemName state
+                onChange={(e) => setItemName(e.target.value)}  // Updates state on input change
               />
             </div>
 
@@ -384,6 +417,8 @@ export default function Home() {
               <textarea
                 id="description"
                 className="border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                value={description}  // Binds the textarea to the description state
+                onChange={(e) => setDescription(e.target.value)}  // Updates state on change
               />
             </div>
 
@@ -393,6 +428,8 @@ export default function Home() {
                 id="story_points"
                 type="number"
                 className="border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                value={storyPoints}  // Binds the input to the storyPoints state
+                onChange={(e) => setStoryPoints(Number(e.target.value))}  // Updates state on change
               />
             </div>
 
@@ -402,13 +439,15 @@ export default function Home() {
                 id="assigned"
                 type="text"
                 className="border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                value={assigned}  // Binds the input to the assigned state
+                onChange={(e) => setAssigned(e.target.value)}  // Updates state on change
               />
             </div>
+          </form>
 
             <Button onClick={onAddItem} className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700">
               Add Item
             </Button>
-          </form>
         </div>
       </Modal>
 
