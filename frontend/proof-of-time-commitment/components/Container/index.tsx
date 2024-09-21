@@ -11,6 +11,7 @@ const Container = ({
   title,
   description,
   onAddItem,
+  userRole, // Add userRole prop
 }: ContainerProps) => {
   const {
     attributes,
@@ -25,6 +26,7 @@ const Container = ({
       type: 'container',
     },
   });
+
   return (
     <div
       {...attributes}
@@ -46,11 +48,16 @@ const Container = ({
       </div>
 
       {children}
-      <Button variant="ghost" onClick={onAddItem}>
-        Add Item
-      </Button>
+
+      {/* Conditionally render the Add Item button only if the user is a manager */}
+      {userRole === 'manager' && (
+        <Button variant="ghost" onClick={onAddItem}>
+          Add Item
+        </Button>
+      )}
     </div>
   );
 };
 
 export default Container;
+
