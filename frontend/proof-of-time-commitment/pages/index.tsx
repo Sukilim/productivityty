@@ -80,10 +80,14 @@ export default function Home() {
 	useEffect(() => {
 		if (primaryWallet) {
 			setUserAddress(primaryWallet.address);
+			isManager();
+			console.log("USER ROLE IS: ", userRole);
 		} else {
 			setUserAddress(null);
 		}
 	}, [primaryWallet]);
+
+
 
   useEffect(() => {
     if (containers.length === 0) {
@@ -160,7 +164,9 @@ export default function Home() {
 		try {
 			const isManager = await contract.managers(primaryWallet?.address);
 			if (isManager === true) {
-//TODO: SET STATE FOR MANAGER BOOLEAN
+				setUserRole('manager')
+			} else {
+				setUserRole('worker')
 			}
 		} catch (err) {
 			console.error("Error checking for manager: ", err);
@@ -191,13 +197,12 @@ export default function Home() {
     });
     setContainers([...containers]);
     setItemName('');
-	// const taskResponse = await fetch('/api/task', {
- //    method: 'POST',
- //    headers: { 'Content-Type': 'application/json' },
- //    body: JSON.stringify({ name: name, address: employeeAddress }),
-	//   });
-	//   const newTask = await taskResponse.json();
-	// 	const taskId = newTask.id;
+	const taskResponse = await fetch('/api/task', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name: name, address: employeeAddress }),
+	  });
+	  const newTask = await taskResponse.json();
 
 	assignTask(1, employeeAddress);
     setShowAddItemModal(false);
