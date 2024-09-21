@@ -122,7 +122,7 @@ export default function Home() {
       setShowItemDetailModal(true); // Show the item detail modal
     }
   }
-	
+
 	const assignTask = async (taskId, employeeAddress) => {
 		let signer = null;
 		let provider;
@@ -203,7 +203,7 @@ export default function Home() {
     setShowAddItemModal(false);
   };
 
-  // Find the value of the items
+
   function findValueOfItems(id: UniqueIdentifier | undefined, type: string) {
     if (type === 'container') {
       return containers.find((item) => item.id === id);
@@ -235,7 +235,7 @@ export default function Home() {
     return container.items;
   };
 
-  // DND Handlers
+
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
@@ -440,29 +440,64 @@ export default function Home() {
     <div className="mx-auto max-w-7xl p-10">
       {/* Add Item Modal */}
       <Modal showModal={showAddItemModal} setShowModal={setShowAddItemModal}>
-        <div className="flex flex-col w-full items-start gap-y-4">
-          <h1 className="text-gray-800 text-3xl font-bold">Add Item</h1>
-          <Input
-            type="text"
-            placeholder="Item Title"
-            name="itemname"
-            value={itemName}
-            onChange={(e) => setItemName(e.target.value)}
-          />
-          <Button onClick={onAddItem}>Add Item</Button>
+        <div className="flex flex-col w-full max-w-lg p-6 bg-white rounded-lg shadow-lg">
+          <h1 className="text-gray-800 text-3xl font-bold mb-4">Add Item</h1>
+
+          <form className="w-full flex flex-col gap-y-4">
+            <div className="flex flex-col">
+              <label htmlFor="title" className="text-gray-600">Title</label>
+              <input
+                id="title"
+                type="text"
+                className="border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            <div className="flex flex-col">
+              <label htmlFor="description" className="text-gray-600">Description</label>
+              <textarea
+                id="description"
+                className="border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            <div className="flex flex-col">
+              <label htmlFor="story_points" className="text-gray-600">Story Points</label>
+              <input
+                id="story_points"
+                type="number"
+                className="border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            <div className="flex flex-col">
+              <label htmlFor="assigned" className="text-gray-600">Assigned To</label>
+              <input
+                id="assigned"
+                type="text"
+                className="border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            <Button onClick={onAddItem} className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700">
+              Add Item
+            </Button>
+          </form>
         </div>
       </Modal>
+
 
       <Modal showModal={showItemDetailModal} setShowModal={setShowItemDetailModal}>
         <div className="flex flex-col w-full items-start gap-y-4">
           <h1 className="text-gray-800 text-3xl font-bold">Item Details</h1>
           {selectedItem && (
             <div>
-              <p><strong>Title:</strong> {selectedItem.title}</p>
-              <p><strong>ID:</strong> {selectedItem.id}</p>
-            </div>
+        <p><strong>Title:</strong> {selectedItem.title}</p>
+        <p><strong>Description:</strong> {selectedItem.description}</p>
+        <p><strong>Story Points:</strong> {selectedItem.story_points}</p>
+        <p><strong>Assigned:</strong> {selectedItem.assigned}</p>
+        </div>
           )}
-          {/* Add a close button to ensure there's a tabbable node */}
           <button
             onClick={() => setShowItemDetailModal(false)}
             className="mt-4 p-2 bg-blue-500 text-white rounded-lg"
@@ -472,9 +507,8 @@ export default function Home() {
         </div>
       </Modal>
 
-
       <div className="flex items-center justify-between gap-y-2">
-        <h1 className="text-gray-800 text-3xl font-bold">Productivityty</h1>
+        <h1 className="text-gray-800 text-3xl font-bold">CrytoTask</h1>
 
         {/* Dropdown */}
         <select
@@ -490,54 +524,110 @@ export default function Home() {
       </div>
 
       <div className="mt-10">
-        <div className="grid grid-cols-4 gap-6">
-          <DndContext
-            sensors={sensors}
-            collisionDetection={closestCorners}
-            onDragStart={handleDragStart}
-            onDragMove={handleDragMove}
-            onDragEnd={handleDragEnd}
-          >
-            <SortableContext items={containers.map((i) => i.id)}>
-              {containers.map((container) => (
-                <Container
-                  id={container.id}
-                  title={container.title}
-                  key={container.id}
-                  onAddItem={() => {
-                    if (userRole === 'manager') { // Only managers can add items
-                      setShowAddItemModal(true);
-                      setCurrentContainerId(container.id);
-                    }
-                  }}
-                  userRole={userRole}
-                >
-                  <SortableContext items={container.items.map((i) => i.id)}>
-                    <div className="flex items-start flex-col gap-y-4">
-                      {container.items.map((i) => (
-                        <Items title={i.title} id={i.id} key={i.id} onClick={() => handleItemClick(i.id)}/>
-                      ))}
-                    </div>
-                  </SortableContext>
-                </Container>
-              ))}
-            </SortableContext>
+        {userRole === 'manager' ? (
+          <div className="grid grid-cols-4 gap-6">
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCorners}
+              onDragStart={handleDragStart}
+              onDragMove={handleDragMove}
+              onDragEnd={handleDragEnd}
+            >
+              <SortableContext items={containers.map((i) => i.id)}>
+                {containers.map((container) => (
+                  <Container
+                    id={container.id}
+                    title={container.title}
+                    key={container.id}
+                    onAddItem={() => {
+                      if (userRole === 'manager') { // Only managers can add items
+                        setShowAddItemModal(true);
+                        setCurrentContainerId(container.id);
+                      }
+                    }}
+                    userRole={userRole}
+                  >
+                    <SortableContext items={container.items.map((i) => i.id)}>
+                      <div className="flex items-start flex-col gap-y-4">
+                        {container.items.map((i) => (
+                          <Items title={i.title} id={i.id} key={i.id} onClick={() => handleItemClick(i.id)} />
+                        ))}
+                      </div>
+                    </SortableContext>
+                  </Container>
+                ))}
+              </SortableContext>
 
-            <DragOverlay adjustScale={false}>
-              {activeId && activeId.toString().includes('item') && (
-                <Items id={activeId} title={findItemTitle(activeId)} onClick={() => handleItemClick(i.id)} />
-              )}
-              {activeId && activeId.toString().includes('container') && (
-                <Container id={activeId} userRole={userRole} title={findContainerTitle(activeId)}>
-                  {findContainerItems(activeId).map((i) => (
-                    <Items key={i.id} title={i.title} id={i.id} onClick={() => handleItemClick(i.id)} />
+              <DragOverlay adjustScale={false}>
+                {activeId && activeId.toString().includes('item') && (
+                  <Items id={activeId} title={findItemTitle(activeId)} onClick={() => handleItemClick(activeId)} />
+                )}
+                {activeId && activeId.toString().includes('container') && (
+                  <Container id={activeId} userRole={userRole} title={findContainerTitle(activeId)}>
+                    {findContainerItems(activeId).map((i) => (
+                      <Items key={i.id} title={i.title} id={i.id} onClick={() => handleItemClick(i.id)} />
+                    ))}
+                  </Container>
+                )}
+              </DragOverlay>
+            </DndContext>
+          </div>
+        ) : (
+          <div className="grid grid-cols-3 gap-6">
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCorners}
+              onDragStart={handleDragStart}
+              onDragMove={handleDragMove}
+              onDragEnd={handleDragEnd}
+            >
+              <SortableContext items={containers
+                .filter(container => container.title !== 'To-Do') // Exclude 'To-Do' for non-managers
+                .map((i) => i.id)
+              }>
+                {containers
+                  .filter(container => container.title !== 'To-Do') // Exclude 'To-Do' for non-managers
+                  .map((container) => (
+                    <Container
+                      id={container.id}
+                      title={container.title}
+                      key={container.id}
+                      onAddItem={() => {
+                        if (userRole === 'manager') { // Only managers can add items
+                          setShowAddItemModal(true);
+                          setCurrentContainerId(container.id);
+                        }
+                      }}
+                      userRole={userRole}
+                    >
+                      <SortableContext items={container.items.map((i) => i.id)}>
+                        <div className="flex items-start flex-col gap-y-4">
+                          {container.items.map((i) => (
+                            <Items title={i.title} id={i.id} key={i.id} onClick={() => handleItemClick(i.id)} />
+                          ))}
+                        </div>
+                      </SortableContext>
+                    </Container>
                   ))}
-                </Container>
-              )}
-            </DragOverlay>
-          </DndContext>
-        </div>
+              </SortableContext>
+
+              <DragOverlay adjustScale={false}>
+                {activeId && activeId.toString().includes('item') && (
+                  <Items id={activeId} title={findItemTitle(activeId)} onClick={() => handleItemClick(activeId)} />
+                )}
+                {activeId && activeId.toString().includes('container') && (
+                  <Container id={activeId} userRole={userRole} title={findContainerTitle(activeId)}>
+                    {findContainerItems(activeId).map((i) => (
+                      <Items key={i.id} title={i.title} id={i.id} onClick={() => handleItemClick(i.id)} />
+                    ))}
+                  </Container>
+                )}
+              </DragOverlay>
+            </DndContext>
+          </div>
+        )}
       </div>
     </div>
   );
+
 }

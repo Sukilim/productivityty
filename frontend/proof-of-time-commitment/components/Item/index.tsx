@@ -7,6 +7,10 @@ import clsx from 'clsx';
 type ItemsType = {
   id: UniqueIdentifier;
   title: string;
+  description: string;
+  story_points: number;
+  assigned: string;
+
   onClick?: () => void; // Optional onClick handler if you want to handle clicks
 };
 
