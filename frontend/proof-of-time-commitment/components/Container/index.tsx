@@ -50,9 +50,9 @@ const Container = ({
       {children}
 
       {/* Conditionally render the Add Item button only if the user is a manager */}
-      {userRole === 'manager' && title === 'To-Do' && (
+      {userRole === 'manager' && title === 'Todo' && (
         <Button variant="ghost" onClick={onAddItem}>
-		  <img src="plus.png" alt="crypto task" style={{maxWidth: "10%"}}></img>
+		  <img src="plus.png" alt="crypto task" style={{maxWidth: "25%"}}></img>
         </Button>
       )}
     </div>
