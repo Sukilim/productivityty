@@ -19,7 +19,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 					desc,
 					sp,
 					assignee,
-					project: { connect: { id: projectId } },
+					project: { connect: { id: parseInt(projectId) } },
 					status,
 					manager,
 				},

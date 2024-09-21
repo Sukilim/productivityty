@@ -183,9 +183,10 @@ export default function Home() {
 		let contract = new ethers.Contract(contractAddress, contractABI, signer)
 
 		try {
-			const tx = await contract.claimTaskCompletion(taskId, managerAddress);
+			const tx = await contract.claimTaskCompletion(parseInt(taskId), managerAddress);
 			await tx.wait();
 			console.log("claim task completed")
+			setShowItemDetailModal(false)
 		} catch (err) {
 			console.error("claim task error", err);
 		}
@@ -329,11 +330,28 @@ export default function Home() {
 
 			} else if (item.status === "review") {
 				//TODO: handle attestation
-				await confirmTaskCompletion(item.id, item.assigned, "1", true, item.story_points)
+				//
+				console.log(parseInt(item.id))
+				console.log(item.assigned)
+				console.log(3)
+				console.log(true)
+				console.log(item.story_points)
+				await confirmTaskCompletion(parseInt(item.id), item.assignee, 3, true, item.sp)
 			}
 
 			// Update the item's status
+			console.log("---------------",nextStatus);
+			console.log("------user---------",item.status);
 			item.status = nextStatus; // Replace 'newStatus' with the desired status
+
+			const taskResponse = await fetch('/api/tasks/'+item.id, {
+			method: 'PATCH',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({status: item.status}),
+			});
+			
+			const newTask = await taskResponse.json();
+			console.log("NEW RESPONSE: ", newTask);
 
 			// Update the container with the updated item
 			// newContainers[containerIndex] = {
