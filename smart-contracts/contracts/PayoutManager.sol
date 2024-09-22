@@ -9,12 +9,15 @@ import {Attestation} from "@ethsign/sign-protocol-evm/src/models/Attestation.sol
 
 // @dev This contract manages attestation data validation logic.
 contract DataValidator is Ownable {
-    uint256 public threshold;
+    uint256 public projectId;
 
     error TaskNotCompleted();
     error InvalidTaskId(uint256 taskId);
+    error InvalidProjectId(uint256 _projectId);
 
-    constructor() Ownable(_msgSender()) {}
+    constructor(uint _projectId) Ownable(_msgSender()) {
+        projectId = _projectId;
+    }
 
     // @dev Internal function to validate that the task is marked as "Completed"
     function _checkTaskCompleted(bool completed) internal pure {
@@ -31,7 +34,11 @@ contract DataValidator is Ownable {
         }
     }
 
-    // TODO: check projectID is valid
+    function _validateProjectId(uint256 _projectId) internal view {
+        if (_projectId == projectId) {
+            revert InvalidProjectId(_projectId);
+        }
+    }
 }
 
 // @dev This contract implements the actual schema hook.
@@ -40,12 +47,29 @@ contract PayoutManager is ISPHook, DataValidator {
     error InsufficientFunds();
 
     uint256 public paymentPerStoryPoint = 0.001 ether;
+    address public spInstance;
 
     event BudgetReceived(uint256 amount);
     event PaidOut(address indexed receiver, uint256 amount);
 
+    error CallerIsNotSPInstance();
+
+    modifier onlySPInstance() {
+        if (_msgSender() != spInstance) {
+            revert CallerIsNotSPInstance();
+        }
+        _;
+    }
+
     receive() external payable {
         emit BudgetReceived(msg.value);
+    }
+
+    constructor(
+        uint256 _projectId,
+        address _spInstance
+    ) DataValidator(_projectId) {
+        spInstance = _spInstance;
     }
 
     function didReceiveAttestation(
@@ -53,19 +77,19 @@ contract PayoutManager is ISPHook, DataValidator {
         uint64, // schemaId
         uint64 attestationId,
         bytes calldata // extraData
-    ) external payable {
+    ) external payable onlySPInstance {
         Attestation memory attestation = ISP(_msgSender()).getAttestation(
             attestationId
         );
-        // _checkThreshold(abi.decode(attestation.data, (uint256)));
         (
-            uint256 projectId,
+            uint256 _projectId,
             uint256 taskId,
             bool completed,
             uint256 storyPoints
         ) = abi.decode(attestation.data, (uint64, uint64, bool, uint64));
         _checkTaskCompleted(completed);
         _validateTaskId(taskId);
+        _validateProjectId(_projectId);
 
         uint256 paymentAmount = storyPoints * paymentPerStoryPoint;
         if (address(this).balance < paymentAmount) {
